@@ -16,31 +16,34 @@
 
         <h1>Bike in Rio</h1>
 
-        <div class="row">
-            <div class="col-8">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Digite o endereço da busca" aria-label="Busca de endereço" aria-describedby="button-buscar" id="campo-busca">
-                    <button class="btn btn-outline-secondary" type="button" id="button-buscar" onclick="buscarBicicletarios()">Buscar</button>
+        <form onsubmit="buscarBicicletarios(); return false;">
+            <div class="row">
+                <div class="col-8">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Digite o endereço da busca" aria-label="Busca de endereço" aria-describedby="button-buscar" id="campo-busca">
+                    </div>
                 </div>
-            </div>
-            <div class="col-4">
-                <div class="row mb-3">
-                    <label for="inputEmail3" class="col-sm col-form-label">Qtd de bicicletários</label>
-                    <div class="col-sm">
-                        <select class="form-select" aria-label="Select de quantidade">
-                            <option value="5" selected>5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
+                <div class="col-4">
+                    <div class="row mb-3">
+                        <label for="inputEmail3" class="col-sm col-form-label">Qtd de bicicletários</label>
+                        <div class="col-sm">
+                            <select class="form-select" aria-label="Select de quantidade" id="qtd-bicicletarios">
+                                <option value="5" selected>5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+          </form>
 
-        <div class="row">
+
+        <div class="row mb-3">
             <div class="col-6">
                 <h3>Bicicletários mais próximos</h3>
             </div>
