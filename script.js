@@ -56,21 +56,19 @@ function procuraBicicletariosProximos(localBuscado){
         )
             .then((response) => response.json())
             .then((data) => {
-                // Limpar a lista de bicicletários antes de exibir novos resultados
                 document.getElementById("lista-bicicletarios").innerHTML = "";
-                alert(localBuscado);
 
-                // Exibir os bicicletários na lista HTML
                 data.elements.forEach((element) => {
                     var nome = element.tags.name || "Bicicletário";
-                    var latitude = element.lat;
-                    var longitude = element.lon;
 
-                    // Criar um item de lista para cada bicicletário
+                    var bicicletarioLatLng = L.latLng(element.lat, element.lon);
+                    var localBuscadoLatLng = L.latLng(localBuscado.split(",")[0], localBuscado.split(",")[1]);
+                    var distancia = localBuscadoLatLng.distanceTo(bicicletarioLatLng) / 1000;
+
+
                     var listItem = document.createElement("li");
-                    listItem.textContent = nome + " - Latitude: " + latitude + ", Longitude: " + longitude;
-
-                    // Adicionar o item de lista à lista de bicicletários
+                    listItem.textContent = nome + " - " + distancia + " km"; 
+                    
                     document.getElementById("lista-bicicletarios").appendChild(listItem);
                 });
             });
