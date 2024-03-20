@@ -20,7 +20,9 @@ function buscarBicicletarios(){
 
     localizarEndereco().then(function(localBuscado) {
         console.log("Local buscado: " + localBuscado); 
-        procuraBicicletariosProximos(localBuscado);
+        procuraBicicletariosProximos(localBuscado).then(function(bicicletarios){
+            exibeBicicletarios(bicicletarios);
+        });
     });
 
     
@@ -33,7 +35,7 @@ function localizarEndereco(){
     // define um contexto para as pesquisas serem limitadas ao rio de janeiro
     const contextoRJ = "&countrycodes=BR&bounded=1&viewbox=-43.795496,-23.083396,-43.096150,-22.732853";
     
-    // promisse porque retornar antes de fazer a consulta na api
+    // promisse porque retorna antes de fazer a consulta na api
     return new Promise(function(resolve) {
         fetch("https://nominatim.openstreetmap.org/search?format=json&q=" + enderecoBuscado + contextoRJ)
             .then((response) => response.json())
@@ -58,20 +60,34 @@ function procuraBicicletariosProximos(localBuscado){
             .then((data) => {
                 document.getElementById("lista-bicicletarios").innerHTML = "";
 
+                var bicicletarios = [];
+
                 data.elements.forEach((element) => {
                     var nome = element.tags.name || "Bicicletário";
-
-                    var bicicletarioLatLng = L.latLng(element.lat, element.lon);
-                    var localBuscadoLatLng = L.latLng(localBuscado.split(",")[0], localBuscado.split(",")[1]);
-                    var distancia = localBuscadoLatLng.distanceTo(bicicletarioLatLng) / 1000;
-
-
-                    var listItem = document.createElement("li");
-                    listItem.textContent = nome + " - " + distancia + " km"; 
-                    
-                    document.getElementById("lista-bicicletarios").appendChild(listItem);
+                    var distancia = calcDistancia(element.lat, element.lon, localBuscado); 
+                    bicicletarios.push({nome: nome, latitude: element.lat, longitude: element.lon, distancia: distancia});
                 });
+                resolve(bicicletarios);
             });
     });
 
+}
+
+function calcDistancia(latitude, longitude, localBuscado){
+    var bicicletario = L.latLng(latitude, longitude);
+    var referencia = L.latLng(localBuscado.split(",")[0], localBuscado.split(",")[1]);
+    return referencia.distanceTo(bicicletario) / 1000;
+}
+
+function exibeBicicletarios(bicicletarios){
+    var qtdBicicletarios = document.getElementById("qtd-bicicletarios").value;
+    bicicletarios.sort((a, b) => a.distancia - b.distancia);
+    document.getElementById("lista-bicicletarios").innerHTML = "";
+
+    for(var i=0; i<qtdBicicletarios;i++){
+        var itemLista = document.createElement("li");
+        itemLista.textContent = bicicletarios[i].nome + " - " + bicicletarios[i].distancia + " km"; 
+        document.getElementById("lista-bicicletarios").appendChild(itemLista);
+    }
+    
 }
