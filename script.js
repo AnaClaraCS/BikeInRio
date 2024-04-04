@@ -1,13 +1,15 @@
+// carregando o mapa com o centro do rio de janeiro
 var map = L.map("map").setView([-22.9068, -43.1729], 13);
 
 //icone personalizado os bicicletarios
 var iconeBicicletario = L.icon({
     iconUrl: 'iconeBicicletario.png',
-    iconSize:     [50, 50], // size of the icon
-    iconAnchor:   [25, 25], // point of the icon which will correspond to marker's location
-    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    iconSize:     [50, 50],
+    iconAnchor:   [25, 25], 
+    popupAnchor:  [-3, -76] 
 });
 
+//coloca titulo de crétidos no mapa
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
@@ -24,9 +26,10 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 //       });
 //     });
 
+//Função principal (chama as outras funções)
 function buscarBicicletarios(){
     localizarEndereco().then(function(localBuscado) { // primeiro encontra as coordenada do lugar pesquisado
-        console.log("Local buscado: " + localBuscado); 
+        //console.log("Local buscado: " + localBuscado); 
         procuraBicicletariosProximos(localBuscado).then(function(bicicletarios){ // segundo - procura os bicicletarios proximos (10km)
             exibeBicicletarios(bicicletarios); //terceiro - exibe a quantidade selecionada
         });
@@ -48,6 +51,7 @@ function localizarEndereco(){
             .then((data) => {
                 if (data.length > 0) {
                     //data é uma matriz com varias localizações que corresponde a busca
+                    // o primeiro valor é o mais parecido
                     var latitude = data[0].lat;
                     var longitude = data[0].lon;
                     //Centralizando mapa no local pesquisado e adicionando marker
@@ -72,23 +76,29 @@ function procuraBicicletariosProximos(localBuscado){
         )
             .then((response) => response.json())
             .then((data) => {
+                //Primeiro esvazia a lista de resultados dos bicicletarios
                 document.getElementById("lista-bicicletarios").innerHTML = "";
 
+                // Cria uma lista de bicicletarios
                 var bicicletarios = [];
+                // para cada elemento do retorno da api
                 data.elements.forEach((element) => {
-                    var nome = element.tags.name || "Bicicletário";
+                    //define o nome como o nome do nó se tiver, se não define como Bicicletário
+                    var nome = element.tags.name || "Bicicletário"; 
+                    // calcula a distancia entre o nó e o local buscado
                     var distancia = calcDistancia(element.lat, element.lon, localBuscado); 
+                    // salva as informações em uma lista de objetos
                     bicicletarios.push({nome: nome, latitude: element.lat, longitude: element.lon, distancia: distancia});
                 });
 
                 // Ordena de forma crescente pela distancia
                 bicicletarios.sort((a, b) => a.distancia - b.distancia);
                 
-                // Seleciono só a quantidade solicitada
+                // Seleciona só a quantidade solicitada
                 var qtdBicicletarios = document.getElementById("qtd-bicicletarios").value;
                 bicicletarios = bicicletarios.slice(0, qtdBicicletarios);
 
-                //Retorno o array
+                //Retorna o array
                 resolve(bicicletarios);
             });
     });
